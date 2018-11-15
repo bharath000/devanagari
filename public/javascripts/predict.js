@@ -79,7 +79,7 @@ $("#model-selector").change(function(){
 
 let model;
 async function loadModel(name){
-    model=await tf.loadModel(`https://localhost:3000/${name}/model.json`);
+    model=await tf.loadModel(`https://morning-anchorage-56517.herokuapp.com/${name}/model.json`);
     $('.loader').hide();
      $('.loader1').hide();
 }
