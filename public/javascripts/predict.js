@@ -55,6 +55,7 @@ $(document).ready()
 {
   $('.loader').hide();
   $('.loader1').hide();
+  $('.progress-bar').hide();
 
 }
 $("#image-selector").change(function(){
@@ -86,6 +87,7 @@ async function loadModel(name){
 
 
 $("#predict-button").click(async function(){
+     $('.progress-bar').show();
     let image= $('#selected-image').get(0);
     let tensor = preprocessImage(image,$("#model-selector").val());
 
@@ -102,6 +104,7 @@ $("#predict-button").click(async function(){
 
 $("#prediction-list").empty();
 top5.forEach(function(p){
+     $('.progress-bar').hide();
     //$("#prediction-list").append(`<li>className: ${p.className},  probability: ${p.probability.toFixed(6)}</li>`);
     $('.pred').append('ClassName: '+p.className);
     //document.getElementById("pred").innerHTML = '${p.className}';

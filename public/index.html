@@ -65,6 +65,11 @@ footer{
 
 <main>
     <div class="container mt-5">
+        <div class = "row">
+        <h3 class ="">Instructions</h3>
+        <p class = "">First select the model and wait untill it is loaded<br>
+            After loading the model choose the Image file from local device by clicking the choose file button, wait untill Image is up-loaded and displayed in the web page<br>Click on the predict button to display the result (intially it takes time to display)</p>
+        </div>
         <div class="row">
             <div class="col-12">
              <!--   <div class="progress progress-bar progress-bar-striped progress-bar-animated mb-2">Loading Model</div>-->
@@ -105,6 +110,7 @@ footer{
             </div>
             <div class="col-sm-4">
                 <h2 class="ml-3 t11">Prediction</h2>
+                <div class="progress progress-bar progress-bar-striped progress-bar-animated mb-2">Predicting .....</div>
                 <ol id="prediction-list"></ol>
                 <span class = "pred text-center"></span>
             </div>
