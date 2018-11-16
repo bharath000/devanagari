@@ -1,4 +1,6 @@
-const IMAGENET_CLASSES = {
+// declaring Class Names dictionary for showing on the webpage
+// mapping the the predicted class to its name
+const Devanagari_CLASSES = {
     0: '',
     1: 'ka',
     2: 'kha',
@@ -53,86 +55,83 @@ const IMAGENET_CLASSES = {
 
 $(document).ready()
 {
-  $('.loader').hide();
+  $('.loader').hide(); // onload documrnt hide all the loaders and progress bars
   $('.loader1').hide();
   $('.progress-bar').hide();
 
 }
+// for selecting the image from local storage/device
 $("#image-selector").change(function(){
-    let reader = new FileReader();
+    let reader = new FileReader();        // setting new filereader as reader
 
     reader.onload = function(){
-        let dataURL = reader.result;
+        let dataURL = reader.result;    // on loading the reader emptying the predicted values and outputs displaed on webpage
         $("#selected-image").attr("src",dataURL);
-        $("#prediction-list").empty();
+       
         $(".pred").empty();
     }
     let file = $("#image-selector").prop('files')[0];
     reader.readAsDataURL(file);
 });
 
-
+// Selecting the model and loading model
 $("#model-selector").change(function(){
-    loadModel($("#model-selector").val());
-    $('.loader').show();
+    loadModel($("#model-selector").val()); 
+    $('.loader').show();   // showing the loading  sysmbol in web-page
      $('.loader1').show();
 })
-
-let model;
+// loadModel function
+let model;  //intil model for function
 async function loadModel(name){
+    //loading model.json file from public folder DVNG_M/dvng_m which contains details of trained and saved model
     model=await tf.loadModel(`https://morning-anchorage-56517.herokuapp.com/${name}/model.json`);
     $('.loader').hide();
-     $('.loader1').hide();
+     $('.loader1').hide();  // upon loading hide the loading sysmbol
 }
 
-
+//Prediction based on input
 $("#predict-button").click(async function(){
-     $('.progress-bar').show();
-    let image= $('#selected-image').get(0);
-    let tensor = preprocessImage(image,$("#model-selector").val());
+     $('.progress-bar').show();  //show progress bar while predicting
+    let image= $('#selected-image').get(0); // get image from the selected file
+    let tensor = preprocessImage(image,$("#model-selector").val()); //using image preprocessing of input
 
-    let prediction = await model.predict(tensor).data();
-    let top5=Array.from(prediction)
+    let prediction = await model.predict(tensor).data();  //predicting based on the input
+    let top5=Array.from(prediction)  // selecting the top propable solution it can be chaged based on requirement
                 .map(function(p,i){
     return {
-        probability: p,
-        className: IMAGENET_CLASSES[i]
+        probability: p,                      // assign probality and their className from predicted class
+        className: Devanagari_CLASSES[i]
     };
     }).sort(function(a,b){
-        return b.probability-a.probability;
+        return b.probability-a.probability; // slicing the number of probalities that need to be displayed
     }).slice(0,1);
 
-$("#prediction-list").empty();
+ 
 top5.forEach(function(p){
-     $('.progress-bar').hide();
+     $('.progress-bar').hide();// hide progress while showing the result
     //$("#prediction-list").append(`<li>className: ${p.className},  probability: ${p.probability.toFixed(6)}</li>`);
-    $('.pred').append('ClassName: '+p.className);
+    $('.pred').append('ClassName: '+p.className); // showing the predicted class in web-page
     //document.getElementById("pred").innerHTML = '${p.className}';
 });
 
 });
 
-
-function preprocessImage(image,modelName)
+// Image pre-processsing
+function preprocessImage(image,modelName) // takes input images and model nmae
 {
     let tensor=tf.fromPixels(image)
-    .resizeNearestNeighbor([32,32])
-    .toFloat();//.sub(meanImageNetRGB)
+    .resizeNearestNeighbor([32,32])   // resize input image into 32X32 or input of the model
+    .toFloat();
           
-    if(modelName==undefined)
+    if(modelName==undefined) // case for not defined modal
     {
-        return tensor.expandDims();
+        return tensor.expandDims();   
     }
-    else if(modelName=="vgg")
+   
+    else if(modelName=="dvng_m") // model is dvng_m 
     {
-        let meanImageNetRGB= tf.tensor1d([123.68,116.779,103.939]);
-        return tensor.sub(meanImageNetRGB)
-                    .reverse(2)
-                    .expandDims();
-    }
-    else if(modelName=="dvng_m")
-    {
-        let offset=tf.scalar(127.5);
+        let offset=tf.scalar(127.5); 
+        // normalizing the input image this is also done during the training the model
         return tensor.sub(offset)
                     .div(offset)
                     .expandDims();
@@ -146,6 +145,6 @@ function preprocessImage(image,modelName)
     }
     else
     {
-        throw new Error("UnKnown Model error");
+        throw new Error("UnKnown Model error"); // throw error if model is not defined
     }
 }
